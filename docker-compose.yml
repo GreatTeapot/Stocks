@@ -1,0 +1,84 @@
+name: stocks
+networks:
+  dev:
+
+services:
+  main-db:
+    image: postgres:17.2-alpine
+    container_name: main-db
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env-dev
+    volumes:
+      - .postgres:/var/lib/postgres/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${PG_USER}']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    # restart: unless-stopped
+
+  app:
+     container_name: my_app
+     build:
+       context: ./src/apps
+       dockerfile: Dockerfile
+     depends_on:
+       main-db:
+         condition: service_healthy
+     ports:
+       - 9999:8000
+     restart: always
+     env_file:
+      - .env-dev
+
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf'
+    depends_on:
+      - app
+    networks:
+      - dev
+
+
+
+
+#  redis:
+#    image: redis:7
+#    container_name: redis_news
+#    command: --port 5370
+#    expose:
+#      - 5370
+#    env_file:
+#      - .env-non-dev
+
+
+
+
+#  celery:
+#    build:
+#      context: .
+#    env_file:
+#      - .env-non-dev
+#    container_name: celery_app
+#    command: ["/app/docker/celery.sh", "celery"]
+#    depends_on:
+#      - redis
+#
+#  flower:
+#    build:
+#      context: .
+#    env_file:
+#      - .env-non-dev
+#    container_name: flower_app
+#    command: ["/test_app/docker/celery.sh", "flower"]
+#    depends_on:
+#      - redis
+#      - celery
+#    ports:
+#      - 8888:5555
