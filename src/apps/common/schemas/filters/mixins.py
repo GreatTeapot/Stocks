@@ -13,11 +13,10 @@ TSchema = TypeVar("TSchema", bound=BaseModel)
 class BaseFilterSchema(BaseModel):
     """Base filter schema."""
 
-    page_number: int = Field(ge=1, description="Page number")
+    page_number: int = Field(ge=1, description="Page number", default=1)
     page_size: int = Field(
-        ge=1, le=30, default=settings.page_size, description="Page size"
+        ge=1, le=settings.max_page_size, default=settings.default_page_size, description="Page size"
     )
-    total_objects: Optional[int] = Field(default=None, description="Total number of objects available")
     search_string: Optional[str] = Field(default=None, description="Search string")
 
 

@@ -32,6 +32,11 @@ GET_RESPONSES = {
     500: {"model": response.ServerErrorResponseSchema},
 }
 
+GET_PUBLIC_RESPONSES = {
+    200: {"model": UserResponseSchema},
+    500: {"model": response.ServerErrorResponseSchema},
+}
+
 EDIT_RESPONSES = {
     200: {
         "description": "Successful Response",

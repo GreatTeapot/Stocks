@@ -10,7 +10,7 @@ class AuthRepository(PaginatedPageRepository):
     model = User
 
     async def get_by_email_or_username(
-        self, email: str, username: str
+            self, credentials: str
     ) :
         """
         Retrieve a user by email or username.
@@ -23,8 +23,8 @@ class AuthRepository(PaginatedPageRepository):
             select(self.model)
             .filter(
                 or_(
-                    self.model.email == email,
-                    self.model.username == username,
+                    self.model.email == credentials,
+                    self.model.username == credentials,
                 ),
                 self.model.deleted.__eq__(False),
             )

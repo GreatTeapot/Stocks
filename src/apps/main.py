@@ -45,7 +45,7 @@ def custom_openapi():
     openapi_schema = get_openapi(
         title="Auth",
         version="1.0",
-        summary="Service for user authorization and authentication, etc.",
+        summary="Authorization service",
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {

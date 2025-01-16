@@ -39,10 +39,10 @@ class BaseService(IService):
         filters: Optional[TFilter],
     ) -> PageViewSchema:
         """Base service method for retrieving a list of data."""
-        async with uow:
-            page_view = await uow.repo.get_all(filters)
-            await uow.commit()
-            return PageViewSchema.model_validate(page_view)
+        # async with uow:
+        #     page_view = await uow.repo.get_all(filters)
+        #     await uow.commit()
+        #     return PageViewSchema.model_validate(page_view)
 
     @classmethod
     async def delete(cls, uow: TUnitOfWork, obj_id: TID) -> Optional[TID]:

@@ -15,7 +15,7 @@ INVALID_DATA_MESSAGE = "Invalid data."
 UNAUTHORIZED_USER_MESSAGE = "Unauthorized user."
 NO_ACCESS_RIGHTS_MESSAGE = "No access rights."
 # -------------------------- BAD REQUEST RESPONSES --------------------------
-CREDENTIALS_BAD_REQUEST = "Invalid credentials or password."
+CREDENTIALS_BAD_REQUEST = "Invalid username/email or password."
 USER_BAD_REQUEST = "User has been removed."
 TOKEN_BAD_REQUEST = "Invalid token."
 

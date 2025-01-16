@@ -1,18 +1,20 @@
-.PHONY: run up down build stop setup
+.PHONY: run up down build stop
 
 # Run the application
+
 run:
-	. venv/bin/activate && python src/apps/main.py run
+	cd src/apps && python3 main.py run
 
 # Docker Compose commands
 up:
 	docker compose up -d
 
 down:
-	docker compose down
+	docker compose down --volumes
 
-stop:
-    docker compose stop
 
 build:
-	docker compose build
+	docker compose up --build
+
+stop:
+	docker compose stop

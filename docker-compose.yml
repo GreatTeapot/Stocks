@@ -3,17 +3,17 @@ networks:
   dev:
 
 services:
-  main-db:
+  postgres.db:
     image: postgres:17.2-alpine
-    container_name: main-db
+    container_name: postgres.db
     ports:
-      - "5432:5432"
+      - "5431:5432"
     env_file:
       - .env-dev
     volumes:
       - .postgres:/var/lib/postgres/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${PG_USER}']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 5s
       timeout: 10s
       retries: 5
@@ -25,17 +25,17 @@ services:
        context: ./src/apps
        dockerfile: Dockerfile
      depends_on:
-       main-db:
+       postgres.db:
          condition: service_healthy
      ports:
-       - 9999:8000
+       - 8000:8000
      restart: always
      env_file:
-      - .env-dev
+      - src/apps/.env
 
 
   nginx:
-    image: nginx:stable-alpine
+    image: nginx:latest
     ports:
       - "80:80"
     volumes:

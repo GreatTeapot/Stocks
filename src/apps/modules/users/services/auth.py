@@ -1,3 +1,5 @@
+from typing import Optional
+
 from jwt import ExpiredSignatureError, DecodeError, MissingRequiredClaimError
 
 from common.services.base import BaseService
@@ -27,7 +29,7 @@ class AuthService(BaseService):
     async def user_authenticate(cls,
                                 uow: AuthUOW,
                                 credentials: str,
-                                password: str) -> UserInfoSchema :
+                                password: str)  :
         """Authenticate a user with their email or username and password."""
         async with uow:
             user = await uow.repo.get_by_email_or_username(credentials)
@@ -39,13 +41,7 @@ class AuthService(BaseService):
                 is_user_deleted=user.deleted,
             )
 
-            return UserInfoSchema(
-                id=user.id,
-                username=user.username,
-                email=user.email,
-                role=user.roles,
-                deleted=user.deleted,
-            )
+            return user
         
 
     @staticmethod

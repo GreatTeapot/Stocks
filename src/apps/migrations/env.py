@@ -1,4 +1,6 @@
+import sys
 from logging.config import fileConfig
+from os.path import dirname, abspath
 
 from alembic import context
 
@@ -6,6 +8,7 @@ from common.models.base import Base
 from core.database import engine_sync
 
 from models.users import User  # noqa
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -59,9 +62,9 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = context.config.attributes.get("connection", None)  # для pytest-alembic
+    connectable = context.config.attributes.get("connection", None)  # for pytest-alembic
 
-    if connectable is None:  # без pytest-alembic
+    if connectable is None:  # without pytest-alembic
         connectable = engine_sync
 
     with connectable.connect() as connection:

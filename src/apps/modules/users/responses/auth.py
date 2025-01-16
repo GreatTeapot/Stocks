@@ -19,7 +19,6 @@ LOGIN_RESPONSES = {
             }
         },
     },
-    401: {"model": response.UnauthorizedResponseSchema},
     500: {"model": response.ServerErrorResponseSchema},
 }
 

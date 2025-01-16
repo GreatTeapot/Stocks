@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Cookie, Header
 
 from api.dependencies.current_user_deps import CurrentUserDep
+from common.schemas.filters.mixins import DataRangeBaseFilterSchema
 from core.constants import REFRESH
 from modules.users.schemas.auth import EmptyUserSchema
 from modules.users.services.auth import AuthService
@@ -17,6 +18,7 @@ UserDep = Annotated[EmptyUserSchema, Depends(CurrentUserDep.get_current_user)]
 # region --------------------------------- USER ---------------------------------------
 UserUOWDep = Annotated[UserUOW, Depends(UserUOW)]
 UserServiceDep = Annotated[UserService, Depends(UserService)]
+UserFilterDep = Annotated[DataRangeBaseFilterSchema, Depends(DataRangeBaseFilterSchema)]
 # endregion ------------------------------------------------------------------------------
 
 # region --------------------------------- AUTH ---------------------------------------

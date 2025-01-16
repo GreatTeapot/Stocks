@@ -32,7 +32,7 @@ class HttpxSettings(CommonSettings):
 
 
 class AuthSettings(CommonSettings):
-    """Environment settings for connecting to the Auth microservice."""
+    """Environment settings for connecting to the Auth service"""
 
     token_url: HttpUrl = Field(
         default="http://localhost:8000/api/v1/auth/login", alias="TOKEN_URL")
@@ -43,10 +43,10 @@ class AuthSettings(CommonSettings):
     public_key_path: Path = Field(default="certs/jwt-public.pem", alias="PUBLIC_KEY_PATH")
     algorithm: str = Field(default="RS256", alias="ALGORITHM")
     access_token_expire_minutes: int = Field(
-        default=5, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+        default=60, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
     )
     refresh_token_expire_minutes: int = Field(
-        default=10, alias="REFRESH_TOKEN_EXPIRE_MINUTES"
+        default=10000, alias="REFRESH_TOKEN_EXPIRE_MINUTES"
     )
 
 class DatabaseSettings(CommonSettings):
@@ -56,7 +56,7 @@ class DatabaseSettings(CommonSettings):
     pg_user: str = Field(default="postgres", alias="PG_USER")
 
     pg_password: str = Field(default="postgres", alias="PG_PASSWORD")
-    pg_database: str = Field(alias="PG_DATABASE")
+    pg_database: str = Field(default="stocks", alias="PG_DATABASE",)
     pg_port: int = Field(default=5432, alias="PG_PORT")
     async_database_url: Optional[PostgresDsn] = Field(default=None)
     sync_database_url: Optional[PostgresDsn] = Field(default=None)
@@ -122,8 +122,9 @@ class Settings(CommonSettings):
 
     port: int = Field(default=8000, alias="PORT")
     host: str = Field(default="localhost", alias="HOST")
-    page_size: int = Field(default=30, alias="PAGE_SIZE")
-    openapi_url: str = Field(default="/swagger/docs/v1.0", alias="OPENAPI_URL")
+    default_page_size: int = Field(default=30, alias="PAGE_SIZE")
+    max_page_size: int = Field(default=30, alias="MAX_PAGE_SIZE")
+    openapi_url: str = Field(default="/docs", alias="OPENAPI_URL")
 
 
 @lru_cache
@@ -135,3 +136,4 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+

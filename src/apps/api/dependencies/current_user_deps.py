@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any, Callable, Coroutine, Optional
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -11,6 +10,7 @@ from modules.users.const import exceptions as exc
 from modules.users.exceptions import user as error
 from modules.users.schemas.auth import UserInfoSchema
 from modules.users.unit_of_works.user import UserUOW
+
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=str(settings.auth.token_url), scheme_name="JWT"
 )
@@ -22,7 +22,7 @@ class CurrentUserDep:
     @staticmethod
     async def get_data_user(
         token: str, uow: UserUOW = None
-    ) -> dict[str, str]:
+    ) :
         """Retrieve user data."""
         try:
             payload = Security.decode_token(token)
@@ -48,7 +48,7 @@ class CurrentUserDep:
 
         if data_user is None:
             raise error.AuthUnauthorizedException()
-        if data_user["deleted"] == "1":
+        if data_user.deleted:
             raise error.AuthBadRequestException(detail=exc.USER_BAD_REQUEST)
 
         return data_user
@@ -61,10 +61,10 @@ class CurrentUserDep:
         """Retrieve the current user."""
         response = await cls.get_data_user(token=token)
         user_info = UserInfoSchema(
-            id=response["id"],
-            username=response["username"],
-            email=response["email"],
-            deleted=bool(response["deleted"]),
-            role=response["role"] if response.get("role") else None,
+            id=response.id,
+            username=response.username,
+            email=response.email,
+            deleted=bool(response.deleted),
+            role=response.role,
         )
         return user_info

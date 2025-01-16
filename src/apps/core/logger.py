@@ -14,15 +14,15 @@ LoadData: TypeAlias = dict[
 
 
 class LoggerConfig:
+
     """
     Class for configuring logging.
     This class loads logging settings from a YAML file and checks the existence 
     of the required directory and files for logs, creating them if necessary.
     """
-
     @staticmethod
     def __load_config() -> LoadData:
-        """Load logging configs from a yml file."""
+        """Загрузить конфиги для логирования из yml-файла."""
         with open("core/log_config.yml", "r") as config:
             return yaml.safe_load(config)
 
@@ -43,7 +43,7 @@ class LoggerConfig:
         # This check is related to Docker. Docker creates the logs directory 
         # when the application is deployed because of the volume name, 
         # so it's only necessary to create the file.
-        elif os.path.exists("logs/"):
+        elif os.path.exists("src/apps/logs/"):
             open("logs/app.log", "w").close()
             return cls.__load_config()
         else:

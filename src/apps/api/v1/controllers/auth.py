@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter
 from starlette.responses import Response
 
@@ -5,18 +7,17 @@ from api.dependencies.dependencies import AuthUOWDep, AuthServiceDep, RefreshDep
 from core.constants import REFRESH
 from core.security import Security
 from modules.users.responses import auth as responses
-from modules.users.schemas.auth import TokenInfoSchema, LogoutResponseSchema
+from modules.users.schemas.auth import TokenInfoSchema, LogoutResponseSchema, LoginRequestSchema
 
 auth = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 
 
 @auth.post(
            path="/login",
-           summary="Login to user account (Authorization).",
+           summary="Login to user account (Authentication).",
            responses=responses.LOGIN_RESPONSES)
 async def login(
-        credentials: str,
-        password: str,
+        body: LoginRequestSchema,
         uow: AuthUOWDep,
         service: AuthServiceDep,
         response: Response,
@@ -25,13 +26,13 @@ async def login(
     Controller for logging into a user's account.
     
     Required arguments:
-    * *`username`* or *(email)*.
+    * *`username`* or *`email`* *.
     
     * *`password`* - password input.
     """
-    user = await service.user_authenticate(uow, credentials, password)
-    access_token = Security.create_access_token(user.email)
-    refresh_token = Security.create_refresh_token(user.email)
+    user = await service.user_authenticate(uow, body.credentials, body.password)
+    access_token = Security.create_access_token(str(user.id))
+    refresh_token = Security.create_refresh_token(str(user.id))
 
     response.set_cookie(key=REFRESH,
                         value=refresh_token, 
