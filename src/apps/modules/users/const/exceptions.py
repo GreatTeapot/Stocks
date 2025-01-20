@@ -15,10 +15,10 @@ INVALID_DATA_MESSAGE = "Invalid data."
 UNAUTHORIZED_USER_MESSAGE = "Unauthorized user."
 NO_ACCESS_RIGHTS_MESSAGE = "No access rights."
 # -------------------------- BAD REQUEST RESPONSES --------------------------
-CREDENTIALS_BAD_REQUEST = "Invalid credentials or password."
-USER_BAD_REQUEST = "User has been removed."
+CREDENTIALS_BAD_REQUEST = "Invalid username/email or password."
+USER_REMOVED_REQUEST = "User has been removed."
 TOKEN_BAD_REQUEST = "Invalid token."
-
+USER_BAD_REQUEST = "Failed to get user details."
 # -------------------------- FORBIDDEN RESPONSES --------------------------
 TOKEN_EXPIRED_FORBIDDEN = (
     "Your token has expired. Please log in again."

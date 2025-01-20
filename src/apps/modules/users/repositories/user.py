@@ -4,9 +4,11 @@ from typing import Optional, TypeAlias, Union
 from uuid import UUID
 
 import sqlalchemy as sa
+from sqlalchemy.orm import joinedload
 
 from common.enums.role import UserRoleEnum
 from common.repositories.mixins import PaginatedPageRepository
+from common.schemas.filters.mixins import DataRangeBaseFilterSchema
 from models.users import User
 from modules.users.exceptions import user as exc
 
@@ -42,5 +44,35 @@ class UserRepository(PaginatedPageRepository):
         current_user_id = await super().add(data)
         return str(current_user_id)
 
+    def __get_stmt_for_method_list(self) -> sa.Select:
+        """Get the query for the list method."""
+        stmt = (
+            sa.select(self.model)
+            .where(self.model.deleted.__eq__(False))
+        )
+        return stmt
 
+    def __is_there_search_string(
+        self, stmt: sa.Select, filters: DataRangeBaseFilterSchema
+    ) -> sa.Select:
+        """Check for the existence of a search string."""
+        if filters.search_string:
+            stmt = stmt.filter(
+                sa.or_(
+                    self.model.username.ilike(f"%{filters.search_string}"),
+                    self.model.email.ilike(f"%{filters.search_string}"),
+                    sa.cast(self.model.role, sa.String).ilike(f"%{filters.search_string}%"),
+                ))
+        return stmt
+
+    async def get_all(
+        self, filters: DataRangeBaseFilterSchema) \
+            -> tuple[int, Optional[sa.ScalarResult]]:
+        """Get all users with filtering by role."""
+        stmt = self.__get_stmt_for_method_list()
+        stmt = self.__is_there_search_string(stmt, filters)
+        stmt = self._is_there_start_and_end_date(stmt, filters)
+        count_records = await self._get_count_records(stmt)
+        records = await self._is_there_records(count_records, stmt, filters)
+        return count_records, records
 

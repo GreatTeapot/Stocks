@@ -1,14 +1,18 @@
+from typing import Optional
+
 from jwt import ExpiredSignatureError, DecodeError, MissingRequiredClaimError
+from starlette.requests import Request
 
 from common.services.base import BaseService
 from core.security import Security
 from modules.users.const import exceptions as resp_exc
 from modules.users.exceptions import user as error
 from modules.users.schemas.auth import UserInfoSchema
+from modules.users.services.user import UserService
 from modules.users.unit_of_works.auth import AuthUOW
 import datetime as dt
 
-class AuthService(BaseService):
+class AuthService(UserService):
     """Service for handling authentication"""
 
     @staticmethod
@@ -21,13 +25,13 @@ class AuthService(BaseService):
         if not Security.verify_password(password, hashed_password=hash_password):
             raise error.AuthBadRequestException(detail=resp_exc.CREDENTIALS_BAD_REQUEST)
         if is_user_deleted:
-            raise error.AuthBadRequestException(detail=resp_exc.USER_BAD_REQUEST)
+            raise error.AuthBadRequestException(detail=resp_exc.USER_REMOVED_REQUEST)
 
     @classmethod
     async def user_authenticate(cls,
                                 uow: AuthUOW,
                                 credentials: str,
-                                password: str) -> UserInfoSchema :
+                                password: str)  :
         """Authenticate a user with their email or username and password."""
         async with uow:
             user = await uow.repo.get_by_email_or_username(credentials)
@@ -39,16 +43,20 @@ class AuthService(BaseService):
                 is_user_deleted=user.deleted,
             )
 
-            return UserInfoSchema(
-                id=user.id,
-                username=user.username,
-                email=user.email,
-                role=user.roles,
-                deleted=user.deleted,
-            )
-        
+            return user
 
-    @staticmethod
+    @classmethod
+    async def google_create_user(cls, request: Request, oauth, uow: AuthUOW) -> dict:
+        """Handle Google OAuth authentication and create a user."""
+        token = await oauth.google.authorize_access_token(request)
+        user_info = token.get("userinfo")
+        if not user_info:
+            raise error.UserBadRequestException()
+        async with uow:
+            user = await cls.create(uow=uow, schema=user_info)
+        return user
+
+    @classmethod
     async def get_user_for_update_tokens(
         uow: AuthUOW, refresh_token: str
     ) -> tuple[str, dt.datetime]:
@@ -79,7 +87,7 @@ class AuthService(BaseService):
                 login = payload["sub"]
                 user = await uow.repo.get(login)
                 if user.deleted:
-                    raise error.AuthBadRequestException(detail=resp_exc.USER_BAD_REQUEST)
+                    raise error.AuthBadRequestException(detail=resp_exc.USER_REMOVED_REQUEST)
                 return login
             else:
                 raise error.AuthBadRequestException(detail=resp_exc.TOKEN_BAD_REQUEST)

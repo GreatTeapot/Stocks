@@ -40,24 +40,14 @@ class BaseRepository(IRepository):
             .filter(
                 data_id == self.model.id,
                 self.model.deleted.__eq__(False),
-            )
+                )
         )
         res = await self.session.execute(stmt)
         return res.scalar_one_or_none()
 
-    async def get_all(self, filters: TFilter) -> ScalarResult:
+    async def get_all(self, filters: TFilter):
         """Base repository method for retrieving a list of data."""
-        stmt = select(self.model).filter(self.model.deleted.__eq__(False))
-
-        for field, value in filters.model_dump(exclude_unset=True).items():
-            if hasattr(self.model, field):
-                stmt = stmt.filter(getattr(self.model, field) == value)
-
-        stmt = stmt.options(joinedload("*"))
-        stmt = stmt.order_by(self.model.updated_at.desc())
-
-        results = await self.session.execute(stmt)
-        return results.scalars()
+        raise NotImplementedError()
 
     async def delete(self, data_id: TID) -> Optional[TID]:
         """Base repository method for updating data status to "deleted"."""
@@ -75,9 +65,6 @@ class BaseRepository(IRepository):
         stmt = delete(self.model).where(data_id == self.model.id).returning(self.model.id)
         res = await self.session.execute(stmt)
         return bool(res.scalar_one_or_none())
-
-
-
 
     async def edit(self, data: EditData, data_id: TID) -> Optional[UUID]:
         """Base repository method for editing data."""

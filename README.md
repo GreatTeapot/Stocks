@@ -2,10 +2,10 @@
 
 ## ✏️ **Project Description**
 Stocks is a project designed for monitoring stocks (with plans to add crypto later) through web scraping with various filters, such as:
-- Displaying stocks below a specific price
+- Displaying stocks below a specific price with **Websocket**
 - Showing only favorite or added stocks
 
-The project currently features **authentication and authorization** functionalities, with authorization partially implemented.  
+The project currently features **authentication and authorization** functionalities, with authorization partially implemented 
 This project is being developed for personal use to streamline stock monitoring.
 
 ---

@@ -1,22 +1,59 @@
+from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter
-from starlette.responses import Response
+from starlette.requests import Request
+from starlette.responses import Response, RedirectResponse
 
 from api.dependencies.dependencies import AuthUOWDep, AuthServiceDep, RefreshDep, UserDep
+from core.config import settings
 from core.constants import REFRESH
 from core.security import Security
 from modules.users.responses import auth as responses
-from modules.users.schemas.auth import TokenInfoSchema, LogoutResponseSchema
+from modules.users.schemas.auth import TokenInfoSchema, LogoutResponseSchema, LoginRequestSchema
 
 auth = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
+
+oauth = OAuth()
+oauth.register(
+    name="google",
+    client_id=settings.authorization.GOOGLE_CLIENT_ID,
+    client_secret=settings.authorization.GOOGLE_CLIENT_SECRET,
+    server_metadata_url=settings.authorization.GOOGLE_SERVER_METADATA_URL,
+    client_kwargs={"scope": "openid email profile"},
+)
+
+
+@auth.get("/google/login")
+async def google_login(request: Request) -> Response:
+    """Google authorization endpoint"""
+    redirect_uri = request.url_for("callback")
+    return await oauth.google.authorize_redirect(request, redirect_uri=redirect_uri)
+
+
+@auth.get("/google/callback")
+async def google_callback(request: Request,
+                          service: AuthServiceDep,
+                          uow: AuthUOWDep):
+    """Google OAuth callback endpoint"""
+    user = await service.google_create_user(request, oauth, uow)
+
+    access_token = Security.create_access_token(user)
+    refresh_token = Security.create_refresh_token(user)
+
+    response = RedirectResponse(url="/")
+
+    response.set_cookie(key=REFRESH,
+                        value=refresh_token,
+                        httponly=True,
+                        secure=False)  # if https set True
+    return response, TokenInfoSchema(access_token=access_token)
 
 
 @auth.post(
            path="/login",
-           summary="Login to user account (Authorization).",
+           summary="Login to user account (Authentication).",
            responses=responses.LOGIN_RESPONSES)
 async def login(
-        credentials: str,
-        password: str,
+        body: LoginRequestSchema,
         uow: AuthUOWDep,
         service: AuthServiceDep,
         response: Response,
@@ -25,21 +62,19 @@ async def login(
     Controller for logging into a user's account.
     
     Required arguments:
-    * *`username`* or *(email)*.
+    * *`username`* or *`email`* *.
     
     * *`password`* - password input.
     """
-    user = await service.user_authenticate(uow, credentials, password)
-    access_token = Security.create_access_token(user.email)
-    refresh_token = Security.create_refresh_token(user.email)
+    user = await service.user_authenticate(uow, body.credentials, body.password)
+    access_token = Security.create_access_token(str(user.id))
+    refresh_token = Security.create_refresh_token(str(user.id))
 
     response.set_cookie(key=REFRESH,
                         value=refresh_token, 
-                        httponly=True, 
-                        secure=False,) # if https, set to True
+                        httponly=True,
+                        secure=False, )  # if https set to True
     return TokenInfoSchema(access_token=access_token)
-
-
 
 
 @auth.post(
@@ -63,8 +98,7 @@ async def get_new_access_token(
     return TokenInfoSchema(access_token=access_token)
 
 
-
-@auth.post(path="/logout/", summary="Logout from user account.")
+@auth.post(path="/logout", summary="Logout from user account.")
 async def logout_user(
     current_user: UserDep,
     response: Response,

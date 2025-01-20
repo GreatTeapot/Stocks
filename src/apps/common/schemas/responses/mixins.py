@@ -64,5 +64,5 @@ class ServerErrorResponseSchema(BaseModel):
 class UserBadRequestResponseSchema(BaseModel):
     """Response schema for invalid user request."""
 
-    detail: str = Field(default=exc.USER_BAD_REQUEST)
+    detail: str = Field(default=exc.USER_REMOVED_REQUEST)
 

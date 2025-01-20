@@ -32,7 +32,7 @@ class HttpxSettings(CommonSettings):
 
 
 class AuthSettings(CommonSettings):
-    """Environment settings for connecting to the Auth microservice."""
+    """Environment settings for connecting to the Auth service"""
 
     token_url: HttpUrl = Field(
         default="http://localhost:8000/api/v1/auth/login", alias="TOKEN_URL")
@@ -43,11 +43,23 @@ class AuthSettings(CommonSettings):
     public_key_path: Path = Field(default="certs/jwt-public.pem", alias="PUBLIC_KEY_PATH")
     algorithm: str = Field(default="RS256", alias="ALGORITHM")
     access_token_expire_minutes: int = Field(
-        default=5, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+        default=60, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
     )
     refresh_token_expire_minutes: int = Field(
-        default=10, alias="REFRESH_TOKEN_EXPIRE_MINUTES"
+        default=10000, alias="REFRESH_TOKEN_EXPIRE_MINUTES"
     )
+
+
+class AuthorizationService(CommonSettings):
+    """Connection for other authorization services"""
+    # Google
+    secret_key: str = Field(default="secret", alias="SECRET_KEY")
+    GOOGLE_CLIENT_ID: int = Field(default=0, alias="GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: str = Field(default="GOOGLE_CLIENT_SECRET", alias="GOOGLE_CLIENT_SECRET")
+    GOOGLE_REDIRECT_URI: str = Field(default="http://localhost:8000/api/v1/auth/google/callback" ,
+                                     alias="GOOGLE_REDIRECT_URI")
+    GOOGLE_SERVER_METADATA_URL: str = Field(default="https://accounts.google.com/.well-known/openid-configuration",
+                                           alias="GOOGLE_SERVER_METADATA_URL")
 
 class DatabaseSettings(CommonSettings):
     """Database environment settings."""
@@ -56,7 +68,7 @@ class DatabaseSettings(CommonSettings):
     pg_user: str = Field(default="postgres", alias="PG_USER")
 
     pg_password: str = Field(default="postgres", alias="PG_PASSWORD")
-    pg_database: str = Field(alias="PG_DATABASE")
+    pg_database: str = Field(default="stocks", alias="PG_DATABASE",)
     pg_port: int = Field(default=5432, alias="PG_PORT")
     async_database_url: Optional[PostgresDsn] = Field(default=None)
     sync_database_url: Optional[PostgresDsn] = Field(default=None)
@@ -116,14 +128,16 @@ class Settings(CommonSettings):
     db: DatabaseSettings = DatabaseSettings()
     auth: AuthSettings = AuthSettings()
     client: HttpxSettings = HttpxSettings()
+    authorization: AuthorizationService = AuthorizationService()
 
     client_id: str = Field(default="fastapi", alias="CLIENT_ID")
     client_secret: str = Field(default="fastapi_secret", alias="CLIENT_SECRET")
 
     port: int = Field(default=8000, alias="PORT")
-    host: str = Field(default="localhost", alias="HOST")
-    page_size: int = Field(default=30, alias="PAGE_SIZE")
-    openapi_url: str = Field(default="/swagger/docs/v1.0", alias="OPENAPI_URL")
+    host: str = Field(alias="HOST")
+    default_page_size: int = Field(default=30, alias="PAGE_SIZE")
+    max_page_size: int = Field(default=30, alias="MAX_PAGE_SIZE")
+    openapi_url: str = Field(default="/docs", alias="OPENAPI_URL")
 
 
 @lru_cache
@@ -135,3 +149,4 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+

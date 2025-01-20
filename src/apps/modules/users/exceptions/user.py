@@ -11,6 +11,12 @@ class UserNotFoundException(HTTPException):
         self.detail = exc.USER_NOT_FOUND
         super().__init__(status_code=self.status_code, detail=self.detail)
 
+class UserBadRequestException(HTTPException):
+    """Exception raised when a user is bad request."""
+    def __init__(self) -> None:
+        self.status_code = 400
+        self.detail = exc.USER_BAD_REQUEST
+        super().__init__(status_code=self.status_code, detail=self.detail)
 
 class EmailAlreadyExistsException(HTTPException):
     """Exception raised when an email already exists in the database."""

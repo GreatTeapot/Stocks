@@ -39,19 +39,23 @@ class PaginatedPageRepository(BaseRepository):
         return count_records
 
     async def _is_there_records(
-        self, count_records: int, stmt: Select, filters: TFilter
+            self, count_records: int, stmt: Select, filters: TFilter
     ) -> Optional[ScalarResult]:
         """Check for the existence of a record."""
         if count_records != 0:
-            total_pages = (count_records - 1) // filters.page_size
+            # Total pages as one-based index
+            total_pages = (count_records + filters.page_size - 1) // filters.page_size
 
-            # Set page_number to the last page if the requested page
-            # exceeds the number of available pages.
-            page_number = min(filters.page_number, total_pages)
+            # Clamp page_number to valid range (1 to total_pages)
+            page_number = max(1, min(filters.page_number, total_pages))
+
+            # Calculate offset based on zero-based index
+            offset = (page_number - 1) * filters.page_size
+
             records = (
                 await self.session.execute(
                     stmt.order_by(self.model.updated_at.desc())
-                    .offset(page_number * filters.page_size)
+                    .offset(offset)
                     .limit(filters.page_size)
                 )
             ).scalars()

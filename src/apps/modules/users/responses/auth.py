@@ -13,13 +13,12 @@ LOGIN_RESPONSES = {
                     },
                     "user_bad_request": {
                         "summary": "User bad request",
-                        "value": {"detail": exc.USER_BAD_REQUEST},
+                        "value": {"detail": exc.USER_REMOVED_REQUEST},
                     },
                 }
             }
         },
     },
-    401: {"model": response.UnauthorizedResponseSchema},
     500: {"model": response.ServerErrorResponseSchema},
 }
 
@@ -31,7 +30,7 @@ REFRESH_RESPONSES = {
                 "examples": {
                     "user_bad_request": {
                         "summary": "User bad request",
-                        "value": {"detail": exc.USER_BAD_REQUEST},
+                        "value": {"detail": exc.USER_REMOVED_REQUEST},
                     },
                     "token_bad_request": {
                         "summary": "Token bad request",

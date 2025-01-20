@@ -72,7 +72,7 @@ target/
 
 # Virtual environment
 .env
-.env-dev
+.env
 .venv/
 venv/
 /.venv/

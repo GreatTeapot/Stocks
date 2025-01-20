@@ -27,9 +27,9 @@ class Security:
         )
 
     @classmethod
-    def create_access_token(cls, email: str, now: dt.datetime = dt.datetime.now(dt.timezone.utc)) -> str:
+    def create_access_token(cls, model_id: str, now: dt.datetime = dt.datetime.now(dt.timezone.utc)) -> str:
         """Create an access token."""
-        payload = {"sub": email, "type": "access"}
+        payload = {"sub": model_id, "type": "access"}
         access_token = cls.__create_token(
             payload=payload,
             minutes=settings.auth.access_token_expire_minutes,
@@ -38,9 +38,9 @@ class Security:
         return access_token
 
     @classmethod
-    def create_refresh_token(cls, email: str, now: dt.datetime = dt.datetime.now(dt.timezone.utc)) -> str:
+    def create_refresh_token(cls, model_id: str, now: dt.datetime = dt.datetime.now(dt.timezone.utc)) -> str:
         """Create a refresh token."""
-        payload = {"sub": email, "type": "refresh"}
+        payload = {"sub": model_id, "type": "refresh"}
         refresh_token = cls.__create_token(
             payload=payload,
             minutes=settings.auth.refresh_token_expire_minutes,

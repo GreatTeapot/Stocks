@@ -3,8 +3,8 @@ from typing import TypeVar
 
 from common.repositories.base import BaseRepository
 
-TRepository = TypeVar("TRepository", bound=BaseRepository)
 
+TRepository = TypeVar("TRepository", bound=BaseRepository)
 
 class IUnitOfWork(abc.ABC):
     """Abstract class for managing transactions."""
@@ -27,3 +27,7 @@ class IUnitOfWork(abc.ABC):
     @abc.abstractmethod
     async def rollback(self) -> None:
         """Abstract method for rolling back a transaction."""
+
+    @abc.abstractmethod
+    async def close(self) -> None:
+        """Abstract method for closing a transaction."""

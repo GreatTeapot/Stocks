@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from pydantic import Field
 
@@ -24,8 +25,14 @@ class EmptyUserSchema(BaseModel):
 class UserInfoSchema(BaseModel):
     """Schema for user information."""
 
-    id: str
+    id: UUID
     username: str
     email: str
     deleted: bool
     role: Optional[str]
+
+
+
+class LoginRequestSchema(BaseModel):
+    credentials: str
+    password: str

@@ -5,6 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
+from starlette.middleware.sessions import SessionMiddleware
 
 from api.v1.routers import routers
 from core.config import settings
@@ -45,7 +46,7 @@ def custom_openapi():
     openapi_schema = get_openapi(
         title="Auth",
         version="1.0",
-        summary="Service for user authorization and authentication, etc.",
+        summary="Authorization service",
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
@@ -59,7 +60,7 @@ app.openapi = custom_openapi
 # endregion -------------------------------------------------------------------------
 
 
-# region -------------------------------- CORS --------------------------------------
+# region -------------------------------- MIDDLEWARES --------------------------------------
 # CORS configuration
 origins = ["*"]
 
@@ -70,6 +71,10 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=False,
 )
+
+app.add_middleware(SessionMiddleware, # type: ignore
+                   secret_key=settings.authorization.secret_key)
+
 # endregion -------------------------------------------------------------------------
 
 # region -------------------------------- Routing -----------------------------------
