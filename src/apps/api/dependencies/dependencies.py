@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Cookie, Header
 
 from api.dependencies.current_user_deps import CurrentUserDep
+from api.dependencies.forms import CustomOAuth2PasswordRequestForm
 from common.schemas.filters.mixins import DataRangeBaseFilterSchema
 from core.constants import REFRESH
 from modules.users.schemas.auth import EmptyUserSchema
@@ -24,6 +25,7 @@ UserFilterDep = Annotated[DataRangeBaseFilterSchema, Depends(DataRangeBaseFilter
 # region --------------------------------- AUTH ---------------------------------------
 AuthUOWDep = Annotated[AuthUOW, Depends(AuthUOW)]
 AuthServiceDep = Annotated[AuthService, Depends(AuthService)]
+AuthLoginForm = Annotated[CustomOAuth2PasswordRequestForm, Depends(CustomOAuth2PasswordRequestForm)]
 # endregion ------------------------------------------------------------------------------
 
 # region ---------------------------------- JWT ---------------------------------------

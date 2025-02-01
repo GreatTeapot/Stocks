@@ -13,8 +13,16 @@ from sqlalchemy import URL
 class CommonSettings(BaseSettings):
     """Common application settings."""
 
+
+    env_file: str = (
+        ".env"
+    )
+    env_local_file: str = (
+        ".env.local"
+    )
+
     model_config = SettingsConfigDict(
-        env_file=os.path.expanduser(".env"),
+        env_file=env_local_file if env_local_file else env_file,
         env_file_encoding="utf-8",
         extra="allow",
     )
@@ -55,6 +63,10 @@ class DatabaseSettings(CommonSettings):
     pg_host: str = Field(default="localhost", alias="PG_HOST")
     pg_user: str = Field(default="postgres", alias="PG_USER")
 
+    pg_test_database: str = Field(default="tests", alias="PG_TEST_DATABASE",)
+    pytest_debug: bool = Field(default=False, alias="PYTEST_DEBUG")
+
+
     pg_password: str = Field(default="postgres", alias="PG_PASSWORD")
     pg_database: str = Field(default="stocks", alias="PG_DATABASE",)
     pg_port: int = Field(default=5432, alias="PG_PORT")
@@ -86,12 +98,13 @@ class DatabaseSettings(CommonSettings):
     @model_validator(mode="after")
     def validate_async_database_url(self) -> Self:
         """Build asynchronous PostgreSQL DSN."""
+        db_name = self.pg_test_database if self.pytest_debug else self.pg_database
         self.async_database_url = self.__build_db_dsn(
             username=self.pg_user,
             password=self.pg_password,
             host=self.pg_host,
             port=self.pg_port,
-            database=self.pg_database,
+            database=db_name,
             async_dsn=True,
         )
         return self
@@ -124,7 +137,7 @@ class Settings(CommonSettings):
     host: str = Field(default="localhost", alias="HOST")
     default_page_size: int = Field(default=30, alias="PAGE_SIZE")
     max_page_size: int = Field(default=30, alias="MAX_PAGE_SIZE")
-    openapi_url: str = Field(default="/docs", alias="OPENAPI_URL")
+    openapi_url: str = Field(default="/docs/v1", alias="OPENAPI_URL")
 
 
 @lru_cache

@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -78,11 +79,14 @@ for router in routers:
 #endregion -------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # in production use gunicorn
-    uvicorn.run(
-        app="main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=True,
-        log_config=LoggerConfig.execute_config(),
-    )
+    if settings.db.pytest_debug:
+        logging.warn("PYTEST_DEBUG is enabled. The application will not start.")
+    else:
+        # in production use gunicorn
+        uvicorn.run(
+            app="main:app",
+            host=settings.host,
+            port=settings.port,
+            reload=True,
+            log_config=LoggerConfig.execute_config(),
+        )

@@ -1,0 +1,47 @@
+services:
+  # region --------------- APPS --------------
+  user.api.stocks:
+    environment:
+      # Redis connection configuration
+      PG_HOST: postgres.db.stocks
+      PG_PORT: 5432
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DATABASE: ${PG_DATABASE_USER}
+
+
+      # Startup configuration
+      PORT: ${PORT_AUTH}
+      HOST: ${HOST_AUTH}
+      # Pagination configuration
+      PAGE_SIZE: ${PAGE_SIZE}
+      # Auth configuration
+      TOKEN_URL: ${TOKEN_URL}
+      PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH}
+      PUBLIC_KEY_PATH: ${PUBLIC_KEY_PATH}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      REFRESH_TOKEN_EXPIRE_MINUTES: ${REFRESH_TOKEN_EXPIRE_MINUTES}
+
+      # Other
+      CLIENT_ID: ${CLIENT_ID_USER}
+      CLIENT_SECRET: ${CLIENT_SECRET_USER}
+      OPENAPI_URL: ${OPENAPI_URL_USER}
+      TZ: Europe/Moscow
+    ports:
+      - "81:80"
+
+
+  # region --------------- DB ----------------
+  postgres.db.stocks:
+    environment:
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+    ports:
+      - "5412:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  # end ---------------------------------------
+
+volumes:
+  postgres_data:
+    driver: local
