@@ -11,7 +11,7 @@ services:
      container_name: user.api.stocks
      build:
        context: ./src/apps
-       dockerfile: Dockerfile
+       dockerfile: src/apps/users/Dockerfile
      depends_on:
        - postgres.db.stocks
      restart: unless-stopped

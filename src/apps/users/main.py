@@ -12,7 +12,6 @@ from core.config import settings
 from core.http_connector import ExternalServiceConnector
 from core.logger import LoggerConfig
 
-
 # region ------------------------------ initialize ----------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:  # noqa

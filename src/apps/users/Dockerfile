@@ -28,7 +28,7 @@ RUN python3 -m pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code
-COPY . .
+COPY .. .
 
 # Command to start the application
 ENTRYPOINT ["/bin/sh", "-c", "alembic upgrade head && python main.py"]
