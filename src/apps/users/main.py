@@ -79,7 +79,7 @@ for router in routers:
 
 if __name__ == "__main__":
     if settings.db.pytest_debug:
-        logging.warn("PYTEST_DEBUG is enabled. The application will not start.")
+        logging.warning("PYTEST_DEBUG is enabled. The application will not start.")
     else:
         # in production use gunicorn
         uvicorn.run(

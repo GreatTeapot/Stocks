@@ -30,6 +30,9 @@ services:
       TZ: Europe/Moscow
     ports:
       - "81:80"
+    volumes:
+      - online_logs:/usr/src/app/logs
+
 
 
   # region --------------- DB ----------------
@@ -43,5 +46,7 @@ services:
   # end ---------------------------------------
 
 volumes:
+  online_logs:
+    name: online_logs
   postgres_data:
     driver: local

@@ -1,0 +1,55 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace  # убирает лишние пробелы
+      - id: check-yaml  # проверяет синтаксис .yaml файлов
+      - id: check-case-conflict  # проверяет файлы, которые могут конфликтовать в файловых системах без учета регистра.
+      - id: check-merge-conflict  # проверяет файлы, содержащие конфликтные строки слияния.
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        name: Black
+        language_version: python3.11
+        files: \.pyi?$
+        exclude: "migrations|.git|__pycache__|.pytest_cache|__init__.py|.env|.env.example"
+        args: [
+          "--color",
+          "--line-length=90",
+          "--target-version=py310",
+          "--target-version=py311",
+          "--check",
+          "--diff",
+        ]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: Isort
+        language_version: python3.11
+        additional_dependencies:
+          - colorama
+        exclude: "migrations|.git|__pycache__|.pytest_cache|__init__.py|.env|.env.example"
+        args: [
+          "--profile=black",
+          "--line-length=90",
+          "--color",
+          "--check-only",
+          "--diff",
+        ]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+        name: Flake8
+        language_version: python3.11
+        exclude: "migrations|.git|__pycache__|.pytest_cache|__init__.py|.env|.env.example"
+        args: [
+          "--max-line-length=90",
+          "--ignore=F821,E704,W503,W391",
+          "--count",
+        ]

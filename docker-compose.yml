@@ -5,13 +5,11 @@ networks:
 
 services:
   # region --------------- APPS -------------
-
-
   user.api.stocks:
      container_name: user.api.stocks
      build:
-       context: ./src/apps
-       dockerfile: src/apps/users/Dockerfile
+       context: ./src/apps/users
+       dockerfile: Dockerfile
      depends_on:
        - postgres.db.stocks
      restart: unless-stopped

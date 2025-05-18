@@ -14,7 +14,6 @@ LoadData: TypeAlias = dict[
 
 
 class LoggerConfig:
-
     """
     Class for configuring logging.
     This class loads logging settings from a YAML file and checks the existence 
